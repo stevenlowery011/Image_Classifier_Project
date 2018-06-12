@@ -35,6 +35,7 @@
     <Content Include="assets\inference_example.png" />
     <Content Include="cat_to_name.json" />
     <Content Include="checkpoint.pth" />
+    <Content Include="environment.yaml" />
     <Content Include="flowers\test\100\image_07896.jpg" />
     <Content Include="flowers\test\100\image_07897.jpg" />
     <Content Include="flowers\test\100\image_07899.jpg" />
@@ -8227,6 +8228,7 @@
     <Content Include="Image Classifier Project.ipynb" />
     <Content Include="LICENSE" />
     <Content Include="README.md" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="assets\" />
