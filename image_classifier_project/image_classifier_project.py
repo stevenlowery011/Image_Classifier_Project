@@ -2,8 +2,12 @@
 image_classifier_project.py docstring
 """
 
+import argparse
+
+
 def main():
-    pass
+    print("in main")
 
 if __name__ == '__main__':
     main()
+

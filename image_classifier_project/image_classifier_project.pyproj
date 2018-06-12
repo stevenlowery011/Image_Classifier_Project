@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>65358aef-29e7-4cb2-8a78-b3ece0870ac8</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>image_classifier_project.py</StartupFile>
+    <StartupFile>train.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
