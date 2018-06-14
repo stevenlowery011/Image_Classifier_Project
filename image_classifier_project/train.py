@@ -3,30 +3,35 @@ train.py docstring
 """
 
 import argparse
-import torch
-from torchvision import datasets, transforms, models
-import matplotlib.pyplot as plt
-import numpy as np
-from torch import nn
-from torch import optim
-import torch.nn.functional as F
-from collections import OrderedDict
-import time
-from workspace_utils import active_session
-import os
-from PIL import Image
 from image_classifier_project import *
 
 
 def main():
+    """
+    docstring
+    """
     in_arg = get_input_args()
-    print(in_arg)
-    model = get_model(in_arg.arch)
-    model, train_dataloader, test_dataloader, total_steps = model_config(in_arg.data_dir, model, in_arg.hidden_units, in_arg.drop_p)
-    print(model)
-    print(train_dataloader)
-    print(total_steps)
-    network_train(model, in_arg.epochs, in_arg.learning_rate, train_dataloader, test_dataloader, total_steps)
+    if in_arg.hidden_units==[]:
+        in_arg.hidden_units=[128, 64, 32];
+    save_path = in_arg.save_dir + in_arg.checkpoint
+    hyperparameters = {'architecture': in_arg.arch,
+                       'hidden_layers': in_arg.hidden_units,
+                       'dropout_probability': in_arg.drop_p,
+                       'learnrate': in_arg.learning_rate,
+                       'epochs': in_arg.epochs}
+    model = get_model(hyperparameters['architecture'])
+    model, train_dataloader, test_dataloader, total_steps = model_config(in_arg.data_dir, model, hyperparameters['hidden_layers'], hyperparameters['dropout_probability'])
+    print("\n")
+    print("Transfer model:               {}".format(hyperparameters['architecture']))
+    print("Hidden layers:                {}".format(hyperparameters['hidden_layers']))
+    print("Learning rate:                {}".format(hyperparameters['learnrate']))
+    print("Dropout probability:          {}".format(hyperparameters['dropout_probability']))
+    print("Epochs:                       {}".format(hyperparameters['epochs']))
+    print("Training data:                {}".format(in_arg.data_dir + '/train'))
+    print("Validation data:              {}".format(in_arg.data_dir + '/test'))
+    print("Checkpoint will be saved to:  {}".format(save_path))
+    network_train(model, hyperparameters['epochs'], hyperparameters['learnrate'], train_dataloader, test_dataloader, total_steps, in_arg.gpu)
+    save_checkpoint(save_path, model, hyperparameters['architecture'], model.classifier.hidden_layers[0].in_features, model.classifier.output.out_features, hyperparameters)
 
 
 
@@ -38,123 +43,22 @@ def get_input_args():
     parser.add_argument('data_dir', action="store", type=str,
                         help='data directory of training images')
     parser.add_argument('--save_dir', type=str, default='model_checkpoints/',
-                        help='directory to save model checkpoints')
+                        help='directory to save model checkpoints; Default: model_checkpoints/')
+    parser.add_argument('--checkpoint', type=str, default='checkpoint.pth',
+                        help='name of checkpoint file to save; Default: checkpoint.pth')
     parser.add_argument('--arch', type=str, default='vgg16',
-                        help='chosen model')
+                        help='chosen model; Default: vgg16')
     parser.add_argument('--learning_rate', type=float, default=0.001,
-                        help='learning rate')
+                        help='learning rate; Default: 0.001')
     parser.add_argument('--hidden_units', action="append", type=int, default=[],
-                        help='hidden layer units')
+                        help='append a hidden layer unit - call multiple times to add more layers; Default: [128, 64, 32]')
     parser.add_argument('--epochs', type=int, default=2,
-                        help='number of epochs')
+                        help='number of epochs; Default - 2')
     parser.add_argument('--drop_p', type=float, default=0.2,
-                        help='dropout probability')
+                        help='dropout probability; Default - 0.2')
+    parser.add_argument('--gpu', action="store_true", default=False,
+                        help='use GPU instead of CPU; Default - False')
     return parser.parse_args()
-
-def get_model(model_name):
-    if model_name=='vgg16':
-        model = models.vgg16(pretrained=True)
-    else:
-        print("\nINPUT ERROR: must select from one of these models: vgg16\n")
-
-    for param in model.parameters():
-        param.requires_grad = False
-
-    return model
-
-
-def model_config(data_dir, model, hidden_layers, dropout_probability):
-    """
-    docstring
-    """
-    train_dir = data_dir + '/train'
-    test_dir = data_dir + '/test'
-
-    train_transform = transforms.Compose([transforms.Resize(255),
-                                      transforms.CenterCrop(224),
-                                      transforms.RandomRotation(30),
-                                      transforms.RandomResizedCrop(224),
-                                      transforms.RandomHorizontalFlip(),
-                                      transforms.ToTensor(),
-                                      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-    test_transform = transforms.Compose([transforms.Resize(255),
-                                      transforms.CenterCrop(224),
-                                      transforms.ToTensor(),
-                                      transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
-
-    train_dataset = datasets.ImageFolder(train_dir, transform=train_transform)
-    test_dataset = datasets.ImageFolder(test_dir, transform=test_transform)
-    train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle = True)
-    test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=64, shuffle = True)
-
-    classifier = Network(model.classifier[0].in_features, len(train_dataset.classes), hidden_layers, drop_p=dropout_probability)
-    model.classifier = classifier
-
-    #total_steps = sum(1 for e in enumerate(train_dataloader))
-    total_steps = 103
-
-    return model, train_dataloader, test_dataloader, total_steps
-
-
-def validation(model, testloader, criterion, processor):
-    test_loss = 0
-    accuracy = 0
-    model.to(processor)
-    for images, labels in testloader:
-        images, labels = images.to(processor), labels.to(processor)
-
-        output = model.forward(images)
-        test_loss += criterion(output, labels).item()
-
-        ps = torch.exp(output)
-        equality = (labels.data == ps.max(dim=1)[1])
-        accuracy += equality.type(torch.FloatTensor).mean()
-    
-    return test_loss, accuracy
-
-
-def network_train(model, epochs, learnrate, train_dataloader, test_dataloader, total_steps):
-    print("Training network...")
-    
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    print(f"Device = {device}")
-    
-    steps = 0
-    running_loss = 0
-    print_every = total_steps
-    criterion = nn.NLLLoss()
-    optimizer = optim.Adam(model.classifier.parameters(), lr=learnrate)
-    model.to(device)
-    start = time.time()
-    
-    for e in range(epochs):
-        steps = 0
-        model.train()
-        for image, label in train_dataloader:
-            steps += 1
-            if steps > total_steps:
-                break
-            print("Epoch: {}/{}.. ".format(e+1, epochs),
-                  "Step: {}/{}..".format(steps, total_steps))
-            image, label = image.to(device), label.to(device)
-            optimizer.zero_grad()
-            output = model.forward(image)
-            loss = criterion(output, label)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item()
-            if steps % print_every == 0:
-                model.eval()
-                with torch.no_grad():
-                    test_loss, accuracy = validation(model, test_dataloader, criterion, device)
-                print("Epoch: {}/{}.. ".format(e+1, epochs),
-                      "Step: {}/{}..".format(steps, total_steps),
-                      "Training Loss: {:.3f}.. ".format(running_loss/print_every),
-                      "Test Loss: {:.3f}.. ".format(test_loss/len(test_dataloader)),
-                      "Test Accuracy: {:.3f}".format(accuracy/len(test_dataloader)),
-                      "-- Time: {:.3f}".format(time.time()-start))
-                running_loss = 0
-                model.train()
 
 
 if __name__ == '__main__':

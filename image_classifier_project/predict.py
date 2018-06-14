@@ -3,11 +3,19 @@ predict.py docstring
 """
 
 import argparse
+from PIL import Image
+import matplotlib.pyplot as plt
+from image_classifier_project import *
 
 def main():
+    """
+    docstring
+    """
     in_arg = get_input_args()
     print(in_arg)
-
+    image = process_image(Image.open(in_arg.input))
+    imshow(image[0])
+    plt.show()
 
 
 def get_input_args():
