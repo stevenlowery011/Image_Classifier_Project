@@ -24,6 +24,9 @@
   <ItemGroup>
     <Compile Include="image_classifier_project.py" />
     <Compile Include="predict.py" />
+    <Compile Include="random_image.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="train.py" />
     <Compile Include="workspace_utils.py" />
   </ItemGroup>
@@ -34,7 +37,6 @@
     <Content Include="assets\Flowers.png" />
     <Content Include="assets\inference_example.png" />
     <Content Include="cat_to_name.json" />
-    <Content Include="checkpoint.pth" />
     <Content Include="environment.yaml" />
     <Content Include="flowers\test\100\image_07896.jpg" />
     <Content Include="flowers\test\100\image_07897.jpg" />

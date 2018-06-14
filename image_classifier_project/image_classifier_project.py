@@ -188,8 +188,10 @@ def network_train(model, epochs, learnrate, train_dataloader, test_dataloader, t
                 running_loss = 0
                 model.train()
 
+    return accuracy/len(test_dataloader)
 
-def save_checkpoint(filepath, model, transfer_model_name, input_size, output_size, hyperparams):
+
+def save_checkpoint(filepath, model, transfer_model_name, input_size, output_size, hyperparams, model_accuracy):
     """
     docstring
     """
@@ -200,9 +202,30 @@ def save_checkpoint(filepath, model, transfer_model_name, input_size, output_siz
                   'drop_p': hyperparams['dropout_probability'],
                   'learnrate': hyperparams['learnrate'],
                   'epochs': hyperparams['epochs'],
+                  'model_accuracy': model_accuracy,
                   'state_dict': model.state_dict()}
 
     torch.save(checkpoint, filepath)
+
+
+def load_checkpoint(filepath):
+    checkpoint = torch.load(filepath)
+    model_name = checkpoint['transfer_model_name']
+    model = get_model(model_name)
+    
+    classifier = Network(checkpoint['input_size'],
+                         checkpoint['output_size'],
+                         checkpoint['hidden_layers'],
+                         checkpoint['drop_p'])
+    model.classifier = classifier
+    model.load_state_dict(checkpoint['state_dict'])
+    hidden_layers = checkpoint['hidden_layers']
+    dropout_probability = checkpoint['drop_p']
+    learnrate = checkpoint['learnrate']
+    epochs = checkpoint['epochs']
+    accuracy = checkpoint['model_accuracy']
+    
+    return model, accuracy
 
 
 def process_image(pil_image):
@@ -249,6 +272,41 @@ def imshow(image, ax=None, title=None):
     ax.imshow(image)
     
     return ax
+
+
+def predict(image_path, model, use_GPU, topk=5):
+    ''' Predict the class (or classes) of an image using a trained deep learning model.
+    '''
+    
+    # DONE: Implement the code to predict the class from an image file
+    image = process_image(Image.open(image_path))
+    
+    if(use_GPU==True):
+        if torch.cuda.is_available():
+            device = torch.device("cuda:0")
+        else:
+            print("GPU not available. Using CPU instead.")
+            device = torch.device("cpu")
+    else:
+        device = torch.device("cpu")
+    print(f"Device = {device}\n")
+
+    # do a forward pass on the image
+    model.eval()
+    model.to(device)
+    criterion = nn.NLLLoss()
+    #optimizer = optim.Adam(model.classifier.parameters(), lr=learnrate)
+    image = image.to(device)
+    with torch.no_grad():
+        output = model.forward(image)
+        ps = torch.exp(output)
+
+    topk_probs_tensor, topk_idx_tensor = ps.topk(topk)
+
+    #probs = topk_probs_tensor.tolist()[0]
+    #classes = [model.class_to_idx[str(sorted(model.class_to_idx)[i])] for i in (topk_idx_tensor).tolist()[0]]
+    
+    return topk_probs_tensor, topk_idx_tensor #probs, classes
 
 
 if __name__ == '__main__':

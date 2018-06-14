@@ -30,8 +30,8 @@ def main():
     print("Training data:                {}".format(in_arg.data_dir + '/train'))
     print("Validation data:              {}".format(in_arg.data_dir + '/test'))
     print("Checkpoint will be saved to:  {}".format(save_path))
-    network_train(model, hyperparameters['epochs'], hyperparameters['learnrate'], train_dataloader, test_dataloader, total_steps, in_arg.gpu)
-    save_checkpoint(save_path, model, hyperparameters['architecture'], model.classifier.hidden_layers[0].in_features, model.classifier.output.out_features, hyperparameters)
+    model_accuracy = network_train(model, hyperparameters['epochs'], hyperparameters['learnrate'], train_dataloader, test_dataloader, total_steps, in_arg.gpu)
+    save_checkpoint(save_path, model, hyperparameters['architecture'], model.classifier.hidden_layers[0].in_features, model.classifier.output.out_features, hyperparameters, model_accuracy)
 
 
 
