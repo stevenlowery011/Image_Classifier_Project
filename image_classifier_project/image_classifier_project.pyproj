@@ -8229,6 +8229,7 @@
     <Content Include="flowers\valid\9\image_06420.jpg" />
     <Content Include="Image Classifier Project.ipynb" />
     <Content Include="LICENSE" />
+    <Content Include="model_checkpoints\checkpoint_alexnet.pth" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>
@@ -8544,6 +8545,7 @@
     <Folder Include="flowers\valid\98\" />
     <Folder Include="flowers\valid\99\" />
     <Folder Include="flowers\valid\9\" />
+    <Folder Include="model_checkpoints\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

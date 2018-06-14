@@ -260,8 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 
-# Neural network checkpoints
-*.pth
-
 # Neural network training photos
 flowers/
