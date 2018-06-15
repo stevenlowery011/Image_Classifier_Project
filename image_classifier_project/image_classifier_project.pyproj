@@ -8230,6 +8230,9 @@
     <Content Include="Image Classifier Project.ipynb" />
     <Content Include="LICENSE" />
     <Content Include="model_checkpoints\checkpoint_alexnet.pth" />
+    <Content Include="predict_output.txt" />
+    <Content Include="predict_with_alexnet.sh" />
+    <Content Include="random_image_output.txt" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>

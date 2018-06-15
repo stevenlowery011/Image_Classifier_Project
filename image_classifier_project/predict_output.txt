@@ -1,0 +1,9 @@
+
+Loading model checkpoint: model_checkpoints/checkpoint_alexnet.pth
+
+Predicting image category...
+Device = cuda:0
+
+Given image: flowers/valid/77/image_00178.jpg
+Given category: passion_flower
+Predicted category: passion flower

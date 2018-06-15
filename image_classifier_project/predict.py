@@ -48,6 +48,11 @@ def main():
     else:
         classes = classes_tensor.tolist()[0]
     
+	# Print the predicted category to output
+    print("Given image: {}".format(in_arg.input))
+    print("Given category: {}".format(in_arg.input_category))
+    print("Predicted category: {}".format(classes[0]))
+    
     # Open the image
     image = process_image(Image.open(in_arg.input))
 
