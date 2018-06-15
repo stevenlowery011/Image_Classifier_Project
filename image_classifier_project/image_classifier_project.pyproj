@@ -8232,11 +8232,15 @@
     <Content Include="LICENSE" />
     <Content Include="model_checkpoints\checkpoint.pth" />
     <Content Include="model_checkpoints\checkpoint_alexnet.pth" />
+    <Content Include="model_checkpoints\checkpoint_vgg11.pth" />
     <Content Include="predict_output.txt" />
     <Content Include="predict_with_alexnet.sh" />
+    <Content Include="predict_with_vgg11.sh" />
     <Content Include="random_image_output.txt" />
     <Content Include="README.md" />
     <Content Include="requirements.txt" />
+    <Content Include="train_output.txt" />
+    <Content Include="train_vgg11.sh" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="assets\" />

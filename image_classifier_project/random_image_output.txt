@@ -1,2 +1,2 @@
-flowers/valid/77/image_00178.jpg
-passion flower
+flowers/valid/75/image_02141.jpg
+thorn apple
