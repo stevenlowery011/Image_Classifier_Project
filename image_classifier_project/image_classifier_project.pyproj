@@ -8227,8 +8227,10 @@
     <Content Include="flowers\valid\9\image_06398.jpg" />
     <Content Include="flowers\valid\9\image_06414.jpg" />
     <Content Include="flowers\valid\9\image_06420.jpg" />
+    <Content Include="Image Classifier Project.html" />
     <Content Include="Image Classifier Project.ipynb" />
     <Content Include="LICENSE" />
+    <Content Include="model_checkpoints\checkpoint.pth" />
     <Content Include="model_checkpoints\checkpoint_alexnet.pth" />
     <Content Include="predict_output.txt" />
     <Content Include="predict_with_alexnet.sh" />
